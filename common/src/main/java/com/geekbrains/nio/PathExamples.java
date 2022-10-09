@@ -19,13 +19,9 @@ public class PathExamples {
         String string = Files.readString(file1);
         System.out.println(string);
         // InputStream stream = Files.newInputStream(file1);
-        Files.copy(
-                dir.resolve("image.png"),
-                dir.resolve("copy.png"),
-                StandardCopyOption.REPLACE_EXISTING
-        );
+        Files.copy(dir.resolve("image.png"), dir.resolve("copy.png"), StandardCopyOption.REPLACE_EXISTING);
 
-        Files.writeString(file1, "I'm Mike!", StandardOpenOption.APPEND);
+        Files.writeString(file1, "I'm Mike! \n", StandardOpenOption.APPEND);
 
     }
 }
