@@ -1,0 +1,19 @@
+1. Requirements.
+
+Usage of Deep Face Lab 2.0 requires high performance PC with modern GPU, ample RAM, storage and fast CPU. Windows 10 is generally recommended for most users but more advanced users may want to use Linux to get better performance. Windows 11 also works. Make sure you use standard versions, using N/KN version of Windows may break DFL, if you use N/KN version of Windows install a free Media Feature Pack from Windows Store to ensure DFL works properly.
+
+Minimum requirements for making very basic and low quality/resolution deepfakes:
+
+- modern 4 core CPU supporting AVX and SSE instructions
+- 16GB of RAM
+- modern Nvidia or AMD GPU with 6GB of VRAM (good for up to 192 resolution models)
+- plenty of storage space and pagefile set to 4 x of RAM size minimum.
+
+Recommended hardware configuration:
+
+Как обучают нейросети
+Главное преимущество нейросетей ― способность к самообучению. Если вернуться к примеру с поиском кота на фотографии, то, несколько раз перепутав его с лисой, нейросеть сделает вывод, что заостренные уши ― не самый характерный признак кота. И тогда она начнет выдавать за ответ «да» не 1, а 0,5 балла. Хорошо обученная нейросеть может распознавать данные, которых не было в наборе для обучения, а также искаженные или неполные данные. Например, узнает кота на фото, даже если видна только часть его морды.
+
+Нейронные сети обучаются тремя методами:
+
+Контролируемое обучение

@@ -1,6 +1,9 @@
 package com.geekbrains.sep22.geekcloudclient;
 
 import com.geekbrains.DaemonThreadFactory;
+import com.geekbrains.model.*;
+import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
+import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
@@ -9,19 +12,20 @@ import javafx.scene.control.ListView;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-
-import static com.geekbrains.Command.*;
-import static com.geekbrains.FileUtils.readFileFromStream;
 
 public class CloudMainController implements Initializable {
     public ListView<String> clientView;
     public ListView<String> serverView;
     private String currentDirectory;
 
-    private DataInputStream dis;
+//    private DataInputStream dis;
+//
+//    private DataOutputStream dos;
 
-    private DataOutputStream dos;
+    private Network<ObjectDecoderInputStream, ObjectEncoderOutputStream> network;
 
     private Socket socket;
 
@@ -29,64 +33,71 @@ public class CloudMainController implements Initializable {
 
     private DaemonThreadFactory factory;
 
-    public void downloadFile(ActionEvent actionEvent) throws IOException {
+    public void downloadFile(ActionEvent actionEvent) throws IOException
+    {
         String fileName = serverView.getSelectionModel().getSelectedItem();
-        dos.writeUTF(GET_FILE_COMMAND.getSimpleName());
-        dos.writeUTF(fileName);
-        dos.flush();
+        network.getOutputStream().writeObject(new FileRequest(fileName));
     }
 
-    public void sendToServer(ActionEvent actionEvent) {
+    public void sendToServer(ActionEvent actionEvent) throws IOException
+    {
         String fileName = clientView.getSelectionModel().getSelectedItem();
-        String filePath = currentDirectory + "/" + fileName;
-        File file = new File(filePath);
-        if (file.isFile()) {
-            try {
-                System.out.println("File: " + fileName + " sent to server");
-                dos.writeUTF(SEND_FILE_COMMAND.getSimpleName());
-                dos.writeUTF(fileName);
-                dos.writeLong(file.length());
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    byte[] bytes = fis.readAllBytes();
-                    dos.write(bytes);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } catch (Exception e) {
-                System.err.println("e = " + e.getMessage());
+        network.getOutputStream().writeObject(new FileMessage(Path.of(currentDirectory).resolve(fileName)));
+    }
+
+    public void deleteFileClient(ActionEvent actionEvent)
+    {
+        String fileName = clientView.getSelectionModel().getSelectedItem();
+        File selectedFile = new File(currentDirectory + "/" + fileName);
+        if (!selectedFile.isDirectory())
+        {
+            try
+            {
+                Files.delete(Path.of(selectedFile.getAbsolutePath()));
+                System.out.println("File deleted: " + fileName);
+                fillView(clientView, getFiles(currentDirectory));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
             }
         }
+        else
+        {
+            System.out.println("It is not file!!!");
+        }
+    }
+
+    public void deleteFileServer(ActionEvent actionEvent) throws IOException {
+        String fileName = serverView.getSelectionModel().getSelectedItem();
+        network.getOutputStream().writeObject(new Delete(fileName));
     }
 
     private void readMessages() {
         try {
             while (needReadMessages) {
-                String command = dis.readUTF();
-                if (SEND_FILE_COMMAND.getSimpleName().equals(command)) {
-                    readFileFromStream(dis, currentDirectory);
+                CloudMessage message = (CloudMessage) network.getInputStream().readObject();
+                if (message instanceof FileMessage fileMessage) {
+                    Files.write(Path.of(currentDirectory).resolve(fileMessage.getFileName()), fileMessage.getBytes());
                     Platform.runLater(() -> fillView(clientView, getFiles(currentDirectory)));
-                } else if (GET_FILES_LIST_COMMAND.getSimpleName().equals(command)) {
-                    System.out.println("Received command: " + GET_FILES_LIST_COMMAND.getSimpleName());
-                    List<String> files = new ArrayList<>();
-                    int size = dis.readInt();
-                    for (int i = 0; i < size; i++) {
-                        String file = dis.readUTF();
-                        files.add(file);
-                    }
-                    // concurrent set views values
-                    Platform.runLater(() -> fillView(serverView, files));
+                }
+                else if (message instanceof ListMessage listMessage)
+                {
+                    Platform.runLater(() -> fillView(serverView, listMessage.getFiles()));
                 }
             }
         } catch (Exception e) {
             System.err.println("Server off");
+            e.printStackTrace();
         }
     }
 
     private void initNetwork() {
         try {
             socket = new Socket("localhost", 8189);
-            dis = new DataInputStream(socket.getInputStream());
-            dos = new DataOutputStream(socket.getOutputStream());
+//            dis = new DataInputStream(socket.getInputStream());
+//            dos = new DataOutputStream(socket.getOutputStream());
+            network = new Network<>(new ObjectDecoderInputStream(socket.getInputStream()), new ObjectEncoderOutputStream(socket.getOutputStream()));
             factory.getThread(this::readMessages, "cloud-client-read-thread")
                     .start();
         } catch (Exception e) {
@@ -110,19 +121,36 @@ public class CloudMainController implements Initializable {
                 }
             }
         });
+        serverView.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2)
+            {
+                String selected = serverView.getSelectionModel().getSelectedItem();
+                try
+                {
+                    network.getOutputStream().writeObject(new PathRequest(selected));
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    private void setCurrentDirectory(String directory) {
+    private void setCurrentDirectory(String directory)
+    {
         currentDirectory = directory;
         fillView(clientView, getFiles(currentDirectory));
     }
 
-    private void fillView(ListView<String> view, List<String> data) {
+    private void fillView(ListView<String> view, List<String> data)
+    {
         view.getItems().clear();
         view.getItems().addAll(data);
     }
 
-    private List<String> getFiles(String directory) {
+    private List<String> getFiles(String directory)
+    {
         // file.txt 125 b
         // dir [DIR]
         File dir = new File(directory);
