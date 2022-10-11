@@ -14,15 +14,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TelnetTerminal {
+public class TelnetTerminal
+{
 
-    /**
-     * Support commands:
-     * cd path - go to dir
-     * touch filename - create file with filename
-     * mkdir dirname - create directory with dirname
-     * cat filename - show filename bytes
-     * */
 
     private Path current;
     private ServerSocketChannel server;
@@ -30,7 +24,8 @@ public class TelnetTerminal {
 
     private ByteBuffer buf;
 
-    public TelnetTerminal() throws IOException {
+    public TelnetTerminal() throws IOException
+    {
         current = Path.of("common");
         buf = ByteBuffer.allocate(256);
         server = ServerSocketChannel.open();
@@ -38,16 +33,21 @@ public class TelnetTerminal {
         server.bind(new InetSocketAddress(8189));
         server.configureBlocking(false);
         server.register(selector, SelectionKey.OP_ACCEPT);
-        while (server.isOpen()) {
+        System.out.println("Server ready \n\r");
+        while (server.isOpen())
+        {
             selector.select();
             Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> keyIterator = keys.iterator();
-            while (keyIterator.hasNext()) {
+            while (keyIterator.hasNext())
+            {
                 SelectionKey key = keyIterator.next();
-                if (key.isAcceptable()) {
+                if (key.isAcceptable())
+                {
                     handleAccept();
                 }
-                if (key.isReadable()) {
+                if (key.isReadable())
+                {
                     handleRead(key);
                 }
                 keyIterator.remove();
@@ -55,47 +55,89 @@ public class TelnetTerminal {
         }
     }
 
-    private void handleRead(SelectionKey key) throws IOException {
+    private void handleRead(SelectionKey key) throws IOException
+    {
         SocketChannel channel = (SocketChannel) key.channel();
         buf.clear();
         StringBuilder sb = new StringBuilder();
-        while (true) {
+        while (true)
+        {
             int read = channel.read(buf);
-            if (read == 0) {
+            if (read == 0)
+            {
                 break;
             }
-            if (read == -1) {
+            if (read == -1)
+            {
                 channel.close();
                 return;
             }
             buf.flip();
-            while (buf.hasRemaining()) {
+            while (buf.hasRemaining())
+            {
                 sb.append((char) buf.get());
             }
             buf.clear();
         }
         System.out.println("Received: " + sb);
         String command = sb.toString().trim();
-        if (command.equals("ls")) {
-            String files = Files.list(current)
-                    .map(p -> p.getFileName().toString())
-                    .collect(Collectors.joining("\n\r"));
+        if (command.equals("ls"))
+        {
+            String files = Files.list(current).map(p -> p.getFileName().toString()).collect(Collectors.joining("\n\r"));
             channel.write(ByteBuffer.wrap(files.getBytes(StandardCharsets.UTF_8)));
-        } else {
-            byte[] bytes = command.getBytes(StandardCharsets.UTF_8);
-            channel.write(ByteBuffer.wrap(bytes));
+
+        }
+        else
+        {
+            String[] com = command.split(" ");
+            if (com.length == 2)
+            {
+                String result = "";
+                switch (com[0])
+                {
+                    case "cd" -> {
+                        if (Files.isDirectory(current.resolve(com[1])))
+                            current = current.resolve(com[1]);
+                        else result = "Isn't directory!";
+                    }
+                    case "cat" -> {
+                        Path file = current.resolve(com[1]);
+                        if (Files.exists(file)) result = Files.readString(file);
+                        else result = "File isn't exist!";
+                    }
+                    case "touch" -> {
+                        Path createdFile = Files.createFile(current.resolve(com[1]));
+                        result = "File " + createdFile.getFileName().toString() + " done\n\r";
+                    }
+                    case "mkdir" -> {
+                        Path createdDirectory = Files.createDirectory(current.resolve(com[1]));
+                        result = "Path " + createdDirectory.getFileName().toString() + " done\n\r";
+                    }
+                    default -> {
+                        break;
+                    }
+                }
+                channel.write(ByteBuffer.wrap(result.getBytes(StandardCharsets.UTF_8)));
+            }
+            else
+            {
+                byte[] bytes = command.getBytes(StandardCharsets.UTF_8);
+                channel.write(ByteBuffer.wrap(bytes));
+            }
         }
     }
 
 
-    private void handleAccept() throws IOException {
+    private void handleAccept() throws IOException
+    {
         SocketChannel socketChannel = server.accept();
         socketChannel.configureBlocking(false);
         socketChannel.register(selector, SelectionKey.OP_READ);
         System.out.println("Client accepted");
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException
+    {
         new TelnetTerminal();
     }
 }

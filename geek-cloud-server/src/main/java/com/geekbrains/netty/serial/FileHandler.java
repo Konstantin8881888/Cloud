@@ -39,6 +39,7 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
             Files.delete(serverDir.resolve(delete.getFileName()));
             ctx.writeAndFlush(new ListMessage(serverDir));
         }
+
         else if (cloudMessage instanceof PathRequest paths)
         {
             if (new File(serverDir.toString() + File.separator + paths.getPathName()).isDirectory()) {
