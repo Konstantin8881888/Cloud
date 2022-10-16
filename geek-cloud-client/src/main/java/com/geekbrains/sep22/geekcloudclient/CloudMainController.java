@@ -16,9 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.geekbrains.Command.*;
-import static com.geekbrains.FileUtils.readFileFromStream;
-
 public class CloudMainController implements Initializable {
     public ListView<String> clientView;
     public ListView<String> serverView;
@@ -36,14 +33,44 @@ public class CloudMainController implements Initializable {
 
     private DaemonThreadFactory factory;
 
-    public void downloadFile(ActionEvent actionEvent) throws IOException {
+    public void downloadFile(ActionEvent actionEvent) throws IOException
+    {
         String fileName = serverView.getSelectionModel().getSelectedItem();
         network.getOutputStream().writeObject(new FileRequest(fileName));
     }
 
-    public void sendToServer(ActionEvent actionEvent) throws IOException {
+    public void sendToServer(ActionEvent actionEvent) throws IOException
+    {
         String fileName = clientView.getSelectionModel().getSelectedItem();
         network.getOutputStream().writeObject(new FileMessage(Path.of(currentDirectory).resolve(fileName)));
+    }
+
+    public void deleteFileClient(ActionEvent actionEvent)
+    {
+        String fileName = clientView.getSelectionModel().getSelectedItem();
+        File selectedFile = new File(currentDirectory + "/" + fileName);
+        if (!selectedFile.isDirectory())
+        {
+            try
+            {
+                Files.delete(Path.of(selectedFile.getAbsolutePath()));
+                System.out.println("File deleted: " + fileName);
+                fillView(clientView, getFiles(currentDirectory));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            System.out.println("It is not file!!!");
+        }
+    }
+
+    public void deleteFileServer(ActionEvent actionEvent) throws IOException {
+        String fileName = serverView.getSelectionModel().getSelectedItem();
+        network.getOutputStream().writeObject(new Delete(fileName));
     }
 
     private void readMessages() {
@@ -110,17 +137,20 @@ public class CloudMainController implements Initializable {
         });
     }
 
-    private void setCurrentDirectory(String directory) {
+    private void setCurrentDirectory(String directory)
+    {
         currentDirectory = directory;
         fillView(clientView, getFiles(currentDirectory));
     }
 
-    private void fillView(ListView<String> view, List<String> data) {
+    private void fillView(ListView<String> view, List<String> data)
+    {
         view.getItems().clear();
         view.getItems().addAll(data);
     }
 
-    private List<String> getFiles(String directory) {
+    private List<String> getFiles(String directory)
+    {
         // file.txt 125 b
         // dir [DIR]
         File dir = new File(directory);

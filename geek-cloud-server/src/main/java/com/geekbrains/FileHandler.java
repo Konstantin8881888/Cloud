@@ -54,10 +54,13 @@ public class FileHandler implements Runnable {
             while (true) {
                 String command = dis.readUTF();
                 System.out.println("Received command: " + command);
-                if (command.equals(SEND_FILE_COMMAND.getSimpleName())) {
+                if (command.equals(SEND_FILE_COMMAND.getSimpleName()))
+                {
                     readFileFromStream(dis, SERVER_DIR);
                     sendServerFiles();
-                } else if (GET_FILE_COMMAND.getSimpleName().equals(command)) {
+                }
+                else if (GET_FILE_COMMAND.getSimpleName().equals(command))
+                {
                     String fileName = dis.readUTF();
                     String filePath = SERVER_DIR + "/" + fileName;
                     File file = new File(filePath);
@@ -67,21 +70,30 @@ public class FileHandler implements Runnable {
                             dos.writeUTF(SEND_FILE_COMMAND.getSimpleName());
                             dos.writeUTF(fileName);
                             dos.writeLong(file.length());
-                            try (FileInputStream fis = new FileInputStream(file)) {
+                            try (FileInputStream fis = new FileInputStream(file))
+                            {
                                 byte[] bytes = fis.readAllBytes();
                                 dos.write(bytes);
-                            } catch (IOException e) {
+                            }
+                            catch (IOException e)
+                            {
                                 throw new RuntimeException(e);
                             }
-                        } catch (Exception e) {
+                        } catch (Exception e)
+                        {
                             System.err.println("e = " + e.getMessage());
                         }
                     }
-                } else {
+                }
+
+                else
+                {
                     System.out.println("Unknown command received: " + command);
                 }
             }
-        } catch (Exception ignored) {
+        }
+        catch (Exception ignored)
+        {
             System.out.println("Client disconnected...");
         }
     }

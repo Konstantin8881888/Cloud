@@ -5,5 +5,6 @@ public enum MessageType
     LIST,
     FILE_REQUEST,
     FILE,
-    PATH_REQUEST
+    PATH_REQUEST,
+    DELETE
 }
