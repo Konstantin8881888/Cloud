@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 @Slf4j
 public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
+
 {
     private Path serverDir;
 
@@ -37,6 +38,19 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
         else if (cloudMessage instanceof Delete delete)
         {
             Files.delete(serverDir.resolve(delete.getFileName()));
+            ctx.writeAndFlush(new ListMessage(serverDir));
+        }
+
+        else if (cloudMessage instanceof FileRename fr)
+        {
+            Path path = serverDir.resolve(fr.getOldFileName());
+            File oldFile = new File(path.toString());
+            path = serverDir.resolve(fr.getNewFileName());
+            File newFIle = new File(path.toString());
+            if (Files.exists(oldFile.toPath()) && !Files.isDirectory(oldFile.toPath()))
+            {
+                oldFile.renameTo(newFIle);
+            }
             ctx.writeAndFlush(new ListMessage(serverDir));
         }
 

@@ -6,5 +6,6 @@ public enum MessageType
     FILE_REQUEST,
     FILE,
     PATH_REQUEST,
-    DELETE
+    DELETE,
+    FILE_RENAME
 }
