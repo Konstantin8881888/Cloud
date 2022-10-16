@@ -40,6 +40,18 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
             ctx.writeAndFlush(new ListMessage(serverDir));
         }
 
+        else if (cloudMessage instanceof FileRename fr)
+        {
+            Path path = serverDir.resolve(fr.getOldFileName());
+            File oldFile = new File(path.toString());
+            path = serverDir.resolve(fr.getNewFileName());
+            File newFIle = new File(path.toString());
+            if (Files.exists(oldFile.toPath()) && !Files.isDirectory(oldFile.toPath()))
+            {
+                oldFile.renameTo(newFIle);
+            }
+        }
+
         else if (cloudMessage instanceof PathRequest paths)
         {
             if (new File(serverDir.toString() + File.separator + paths.getPathName()).isDirectory()) {

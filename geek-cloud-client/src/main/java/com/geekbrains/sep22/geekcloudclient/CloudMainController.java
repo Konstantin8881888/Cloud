@@ -6,8 +6,12 @@ import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.*;
 import java.net.Socket;
@@ -16,9 +20,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class CloudMainController implements Initializable {
+public class CloudMainController implements Initializable
+{
+    @FXML
     public ListView<String> clientView;
+    @FXML
     public ListView<String> serverView;
+    @FXML
+    private AnchorPane DirectoryField;
+    @FXML
+    public TextField CreateDir;
     private String currentDirectory;
 
 //    private DataInputStream dis;
@@ -68,12 +79,55 @@ public class CloudMainController implements Initializable {
         }
     }
 
-    public void deleteFileServer(ActionEvent actionEvent) throws IOException {
+    public void deleteFileServer(ActionEvent actionEvent) throws IOException
+    {
         String fileName = serverView.getSelectionModel().getSelectedItem();
         network.getOutputStream().writeObject(new Delete(fileName));
     }
 
-    private void readMessages() {
+    public void renameFile(ActionEvent actionEvent) throws IOException
+    {
+        String fileOldName = serverView.getSelectionModel().getSelectedItem();
+        if (fileOldName != null) {
+            DirectoryField.setVisible(true);
+            CreateDir.setPromptText("ENTER NEW FILE NAME");
+            final String a = fileOldName;
+            CreateDir.setOnKeyPressed(keyEvent -> {
+                if (keyEvent.getCode() == KeyCode.ENTER) {
+                    String fileNewName = CreateDir.getText();
+                    try {
+                        network.getOutputStream().writeObject(new FileRename(fileNewName, a));
+                        DirectoryField.setVisible(false);
+                        CreateDir.setText("");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else {
+            fileOldName = clientView.getSelectionModel().getSelectedItem();
+            if (fileOldName != null) {
+                File oldFile = new File(currentDirectory + "/" + fileOldName);
+                if (!Files.isDirectory(oldFile.toPath())) {
+                    DirectoryField.setVisible(true);
+                    CreateDir.setPromptText("ENTER NEW FILE NAME");
+                    CreateDir.setOnKeyPressed(keyEvent -> {
+                        if (keyEvent.getCode() == KeyCode.ENTER) {
+                            String fileNewName = CreateDir.getText();
+                            File newFile = new File(currentDirectory + "/" + fileNewName);
+                            oldFile.renameTo(newFile);
+                            DirectoryField.setVisible(false);
+                            CreateDir.setText("");
+                        }
+                    });
+                    fillView(clientView, getFiles(currentDirectory));
+                }
+            }
+        }
+    }
+
+    private void readMessages()
+    {
         try {
             while (needReadMessages) {
                 CloudMessage message = (CloudMessage) network.getInputStream().readObject();
@@ -92,21 +146,26 @@ public class CloudMainController implements Initializable {
         }
     }
 
-    private void initNetwork() {
-        try {
+    private void initNetwork()
+    {
+        try
+        {
             socket = new Socket("localhost", 8189);
 //            dis = new DataInputStream(socket.getInputStream());
 //            dos = new DataOutputStream(socket.getOutputStream());
             network = new Network<>(new ObjectDecoderInputStream(socket.getInputStream()), new ObjectEncoderOutputStream(socket.getOutputStream()));
             factory.getThread(this::readMessages, "cloud-client-read-thread")
                     .start();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL url, ResourceBundle resourceBundle)
+    {
         needReadMessages = true;
         factory = new DaemonThreadFactory();
         initNetwork();
@@ -122,16 +181,18 @@ public class CloudMainController implements Initializable {
             }
         });
         serverView.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getClickCount() == 2)
-            {
+            if (mouseEvent.getClickCount() == 2) {
                 String selected = serverView.getSelectionModel().getSelectedItem();
-                try
+                if (selected != null)
                 {
-                    network.getOutputStream().writeObject(new PathRequest(selected));
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
+                    try
+                    {
+                        network.getOutputStream().writeObject(new PathRequest(selected));
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -163,6 +224,23 @@ public class CloudMainController implements Initializable {
             }
         }
         return List.of();
+    }
+
+    public void openTextField(ActionEvent actionEvent) {
+        DirectoryField.setVisible(true);
+        CreateDir.setPromptText("ENTER DIRECTORY NAME");
+        CreateDir.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) {
+                String dirName = CreateDir.getText();
+                try {
+                    network.getOutputStream().writeObject(new PathRequest(dirName));
+                    DirectoryField.setVisible(false);
+                    CreateDir.setText("");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 }
