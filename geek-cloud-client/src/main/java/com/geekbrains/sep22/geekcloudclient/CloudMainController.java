@@ -32,9 +32,6 @@ public class CloudMainController implements Initializable
     public TextField CreateDir;
     private String currentDirectory;
 
-//    private DataInputStream dis;
-//
-//    private DataOutputStream dos;
 
     private Network<ObjectDecoderInputStream, ObjectEncoderOutputStream> network;
 
@@ -85,34 +82,48 @@ public class CloudMainController implements Initializable
         network.getOutputStream().writeObject(new Delete(fileName));
     }
 
+
     public void renameFile(ActionEvent actionEvent) throws IOException
     {
         String fileOldName = serverView.getSelectionModel().getSelectedItem();
-        if (fileOldName != null) {
+        if (fileOldName != null) 
+        {
             DirectoryField.setVisible(true);
             CreateDir.setPromptText("ENTER NEW FILE NAME");
             final String a = fileOldName;
             CreateDir.setOnKeyPressed(keyEvent -> {
-                if (keyEvent.getCode() == KeyCode.ENTER) {
+
+                if (keyEvent.getCode() == KeyCode.ENTER)
+                {
                     String fileNewName = CreateDir.getText();
-                    try {
+                    try 
+                    {
                         network.getOutputStream().writeObject(new FileRename(fileNewName, a));
                         DirectoryField.setVisible(false);
                         CreateDir.setText("");
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e)
+                    {
+
                         e.printStackTrace();
                     }
                 }
             });
-        } else {
+        }
+        else
+        {
             fileOldName = clientView.getSelectionModel().getSelectedItem();
-            if (fileOldName != null) {
+            if (fileOldName != null)
+            {
                 File oldFile = new File(currentDirectory + "/" + fileOldName);
-                if (!Files.isDirectory(oldFile.toPath())) {
+                if (!Files.isDirectory(oldFile.toPath()))
+                {
                     DirectoryField.setVisible(true);
                     CreateDir.setPromptText("ENTER NEW FILE NAME");
                     CreateDir.setOnKeyPressed(keyEvent -> {
-                        if (keyEvent.getCode() == KeyCode.ENTER) {
+                        if (keyEvent.getCode() == KeyCode.ENTER)
+                        {
+
                             String fileNewName = CreateDir.getText();
                             File newFile = new File(currentDirectory + "/" + fileNewName);
                             oldFile.renameTo(newFile);
@@ -121,6 +132,8 @@ public class CloudMainController implements Initializable
                         }
                     });
                     fillView(clientView, getFiles(currentDirectory));
+                    System.out.println("File renamed: " + fileOldName);
+
                 }
             }
         }
@@ -128,10 +141,14 @@ public class CloudMainController implements Initializable
 
     private void readMessages()
     {
-        try {
-            while (needReadMessages) {
+        try
+        {
+            while (needReadMessages)
+            {
+
                 CloudMessage message = (CloudMessage) network.getInputStream().readObject();
-                if (message instanceof FileMessage fileMessage) {
+                if (message instanceof FileMessage fileMessage)
+                {
                     Files.write(Path.of(currentDirectory).resolve(fileMessage.getFileName()), fileMessage.getBytes());
                     Platform.runLater(() -> fillView(clientView, getFiles(currentDirectory)));
                 }
@@ -140,7 +157,8 @@ public class CloudMainController implements Initializable
                     Platform.runLater(() -> fillView(serverView, listMessage.getFiles()));
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             System.err.println("Server off");
             e.printStackTrace();
         }
@@ -151,8 +169,6 @@ public class CloudMainController implements Initializable
         try
         {
             socket = new Socket("localhost", 8189);
-//            dis = new DataInputStream(socket.getInputStream());
-//            dos = new DataOutputStream(socket.getOutputStream());
             network = new Network<>(new ObjectDecoderInputStream(socket.getInputStream()), new ObjectEncoderOutputStream(socket.getOutputStream()));
             factory.getThread(this::readMessages, "cloud-client-read-thread")
                     .start();
@@ -172,10 +188,12 @@ public class CloudMainController implements Initializable
         setCurrentDirectory(System.getProperty("user.home"));
         fillView(clientView, getFiles(currentDirectory));
         clientView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
+            if (event.getClickCount() == 2)
+            {
                 String selected = clientView.getSelectionModel().getSelectedItem();
                 File selectedFile = new File(currentDirectory + "/" + selected);
-                if (selectedFile.isDirectory()) {
+                if (selectedFile.isDirectory())
+                {
                     setCurrentDirectory(currentDirectory + "/" + selected);
                 }
             }
@@ -215,9 +233,11 @@ public class CloudMainController implements Initializable
         // file.txt 125 b
         // dir [DIR]
         File dir = new File(directory);
-        if (dir.isDirectory()) {
+        if (dir.isDirectory())
+        {
             String[] list = dir.list();
-            if (list != null) {
+            if (list != null)
+            {
                 List<String> files = new ArrayList<>(Arrays.asList(list));
                 files.add(0, "..");
                 return files;
@@ -226,21 +246,27 @@ public class CloudMainController implements Initializable
         return List.of();
     }
 
-    public void openTextField(ActionEvent actionEvent) {
-        DirectoryField.setVisible(true);
-        CreateDir.setPromptText("ENTER DIRECTORY NAME");
-        CreateDir.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.ENTER) {
-                String dirName = CreateDir.getText();
-                try {
-                    network.getOutputStream().writeObject(new PathRequest(dirName));
-                    DirectoryField.setVisible(false);
-                    CreateDir.setText("");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//    public void openTextField(ActionEvent actionEvent)
+//    {
+//        DirectoryField.setVisible(true);
+//        CreateDir.setPromptText("ENTER DIRECTORY NAME");
+//        CreateDir.setOnKeyPressed(keyEvent -> {
+//            if (keyEvent.getCode() == KeyCode.ENTER)
+//            {
+//                String dirName = CreateDir.getText();
+//                try
+//                {
+//                    network.getOutputStream().writeObject(new PathRequest(dirName));
+//                    DirectoryField.setVisible(false);
+//                    CreateDir.setText("");
+//                }
+//                catch (IOException e)
+//                {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
 }
+

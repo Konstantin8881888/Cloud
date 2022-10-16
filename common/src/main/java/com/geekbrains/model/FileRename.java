@@ -21,3 +21,4 @@ public class FileRename implements CloudMessage
         return MessageType.FILE_RENAME;
     }
 }
+

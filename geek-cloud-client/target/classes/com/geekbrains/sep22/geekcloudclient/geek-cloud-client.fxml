@@ -10,17 +10,11 @@
         <ListView fx:id="clientView" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="247.0" />
         <ListView fx:id="serverView" layoutX="339.0" layoutY="14.0" prefHeight="343.0" prefWidth="247.0" />
         <Button layoutX="275.0" layoutY="80.0" mnemonicParsing="false" onAction="#sendToServer" prefHeight="50.0" prefWidth="50.0" text="&gt;" />
-        <Button layoutX="275.0" layoutY="151.0" mnemonicParsing="false" onAction="#downloadFile" prefHeight="50.0" prefWidth="50.0" text="&lt;" />
-<!--        <Button layoutX="140.0" layoutY="369.0" mnemonicParsing="false" onAction="#openTextField" prefHeight="38.0" prefWidth="120.0" text="Create а folder" />-->
-        <Button layoutX="15.0" layoutY="369.0" mnemonicParsing="false" onAction="#renameFile" prefHeight="38.0" prefWidth="120.0" text="Rename a file" />
-        <Button layoutX="275.0" layoutY="214.0" mnemonicParsing="false" onAction="#deleteFileClient" prefHeight="50.0" prefWidth="50.0" text="Delete client" />
-        <Button layoutX="275.0" layoutY="276.0" mnemonicParsing="false" onAction="#deleteFileServer" prefHeight="50.0" prefWidth="50.0" text="Delete server" />
-<!--    <ListView fx:id="clientView" layoutX="29.0" layoutY="35.0" prefHeight="372.0" prefWidth="252.0"/>-->
-<!--    <ListView fx:id="serverView" layoutX="355.0" layoutY="35.0" prefHeight="372.0" prefWidth="252.0"/>-->
-<!--    <Button onAction="#sendToServer" layoutX="299.0" layoutY="111.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="37.0" text="&gt;"/>-->
-<!--    <Button onAction="#downloadFile" layoutX="299.0" layoutY="162.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="37.0" text="&lt;"/>-->
-<!--    <Button onAction="#deleteFileClient" layoutX="299.0" layoutY="213.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="37.0" text="x"/>-->
-<!--    <Button onAction="#deleteFileServer" layoutX="299.0" layoutY="264.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="37.0" text="xSv"/>-->
+        <Button layoutX="275.0" layoutY="150.0" mnemonicParsing="false" onAction="#downloadFile" prefHeight="50.0" prefWidth="50.0" text="&lt;" />
+        <Button layoutX="275.0" layoutY="220.0" mnemonicParsing="false" onAction="#deleteFileClient" prefHeight="50.0" prefWidth="50.0" text="Xcl" />
+        <Button layoutX="275.0" layoutY="290.0" mnemonicParsing="false" onAction="#deleteFileServer" prefHeight="50.0" prefWidth="50.0" text="Xsr" />
+        <!--        <Button layoutX="140.0" layoutY="369.0" mnemonicParsing="false" onAction="#openTextField" prefHeight="38.0" prefWidth="120.0" text="Create а folder" />-->
+        <Button layoutX="15.0" layoutY="369.0" mnemonicParsing="false" onAction="#renameFile" prefHeight="38.0" prefWidth="120.0" text="Rename File" />
 
         <AnchorPane fx:id="DirectoryField" layoutX="198.0" layoutY="321.0" prefHeight="106.0" prefWidth="247.0" visible="false">
             <children>
@@ -29,3 +23,4 @@
         </AnchorPane>
     </children>
 </AnchorPane>
+

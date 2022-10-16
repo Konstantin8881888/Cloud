@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 @Slf4j
 public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
+
 {
     private Path serverDir;
 
@@ -50,6 +51,7 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
             {
                 oldFile.renameTo(newFIle);
             }
+            ctx.writeAndFlush(new ListMessage(serverDir));
         }
 
         else if (cloudMessage instanceof PathRequest paths)
