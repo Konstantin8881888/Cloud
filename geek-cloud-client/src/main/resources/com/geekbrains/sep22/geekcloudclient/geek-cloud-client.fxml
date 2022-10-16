@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="427.0" prefWidth="606.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.sep22.geekcloudclient.CloudMainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="427.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.sep22.geekcloudclient.CloudMainController">
     <children>
         <ListView fx:id="clientView" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="247.0" />
         <ListView fx:id="serverView" layoutX="339.0" layoutY="14.0" prefHeight="343.0" prefWidth="247.0" />
@@ -13,7 +13,7 @@
         <Button layoutX="275.0" layoutY="150.0" mnemonicParsing="false" onAction="#downloadFile" prefHeight="50.0" prefWidth="50.0" text="&lt;" />
         <Button layoutX="275.0" layoutY="220.0" mnemonicParsing="false" onAction="#deleteFileClient" prefHeight="50.0" prefWidth="50.0" text="Xcl" />
         <Button layoutX="275.0" layoutY="290.0" mnemonicParsing="false" onAction="#deleteFileServer" prefHeight="50.0" prefWidth="50.0" text="Xsr" />
-        <!--        <Button layoutX="140.0" layoutY="369.0" mnemonicParsing="false" onAction="#openTextField" prefHeight="38.0" prefWidth="120.0" text="Create а folder" />-->
+<!--        <Button layoutX="463.0" layoutY="369.0" mnemonicParsing="false" onAction="#openTextField" prefHeight="38.0" prefWidth="120.0" text="Create Folder" />-->
 
         <Button layoutX="15.0" layoutY="369.0" mnemonicParsing="false" onAction="#renameFile" prefHeight="38.0" prefWidth="120.0" text="Rename File" />
 
@@ -24,4 +24,3 @@
         </AnchorPane>
     </children>
 </AnchorPane>
-
