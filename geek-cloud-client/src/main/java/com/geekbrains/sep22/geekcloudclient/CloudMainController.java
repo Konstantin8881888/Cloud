@@ -82,24 +82,29 @@ public class CloudMainController implements Initializable
         network.getOutputStream().writeObject(new Delete(fileName));
     }
 
-    public void renameFile(ActionEvent actionEvent)
+
+    public void renameFile(ActionEvent actionEvent) throws IOException
     {
         String fileOldName = serverView.getSelectionModel().getSelectedItem();
-        if (fileOldName != null)
+        if (fileOldName != null) 
         {
             DirectoryField.setVisible(true);
             CreateDir.setPromptText("ENTER NEW FILE NAME");
             final String a = fileOldName;
             CreateDir.setOnKeyPressed(keyEvent -> {
+
                 if (keyEvent.getCode() == KeyCode.ENTER)
                 {
                     String fileNewName = CreateDir.getText();
-                    try {
+                    try 
+                    {
                         network.getOutputStream().writeObject(new FileRename(fileNewName, a));
                         DirectoryField.setVisible(false);
                         CreateDir.setText("");
-                    } catch (IOException e)
+                    }
+                    catch (IOException e)
                     {
+
                         e.printStackTrace();
                     }
                 }
@@ -118,6 +123,7 @@ public class CloudMainController implements Initializable
                     CreateDir.setOnKeyPressed(keyEvent -> {
                         if (keyEvent.getCode() == KeyCode.ENTER)
                         {
+
                             String fileNewName = CreateDir.getText();
                             File newFile = new File(currentDirectory + "/" + fileNewName);
                             oldFile.renameTo(newFile);
@@ -127,6 +133,7 @@ public class CloudMainController implements Initializable
                     });
                     fillView(clientView, getFiles(currentDirectory));
                     System.out.println("File renamed: " + fileOldName);
+
                 }
             }
         }
@@ -138,6 +145,7 @@ public class CloudMainController implements Initializable
         {
             while (needReadMessages)
             {
+
                 CloudMessage message = (CloudMessage) network.getInputStream().readObject();
                 if (message instanceof FileMessage fileMessage)
                 {
@@ -191,8 +199,7 @@ public class CloudMainController implements Initializable
             }
         });
         serverView.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getClickCount() == 2)
-            {
+            if (mouseEvent.getClickCount() == 2) {
                 String selected = serverView.getSelectionModel().getSelectedItem();
                 if (selected != null)
                 {
@@ -262,3 +269,4 @@ public class CloudMainController implements Initializable
     }
 
 }
+

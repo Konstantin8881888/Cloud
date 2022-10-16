@@ -17,8 +17,8 @@ public class FileRename implements CloudMessage
 
     @Override
     public MessageType getType()
-
     {
         return MessageType.FILE_RENAME;
     }
 }
+

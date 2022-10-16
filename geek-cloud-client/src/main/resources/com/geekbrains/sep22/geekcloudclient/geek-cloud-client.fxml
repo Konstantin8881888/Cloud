@@ -14,6 +14,7 @@
         <Button layoutX="275.0" layoutY="220.0" mnemonicParsing="false" onAction="#deleteFileClient" prefHeight="50.0" prefWidth="50.0" text="Xcl" />
         <Button layoutX="275.0" layoutY="290.0" mnemonicParsing="false" onAction="#deleteFileServer" prefHeight="50.0" prefWidth="50.0" text="Xsr" />
         <!--        <Button layoutX="140.0" layoutY="369.0" mnemonicParsing="false" onAction="#openTextField" prefHeight="38.0" prefWidth="120.0" text="Create а folder" />-->
+
         <Button layoutX="15.0" layoutY="369.0" mnemonicParsing="false" onAction="#renameFile" prefHeight="38.0" prefWidth="120.0" text="Rename File" />
 
         <AnchorPane fx:id="DirectoryField" layoutX="198.0" layoutY="321.0" prefHeight="106.0" prefWidth="247.0" visible="false">
@@ -21,6 +22,6 @@
                 <TextField fx:id="CreateDir" layoutX="26.0" layoutY="58.0" />
             </children>
         </AnchorPane>
-
     </children>
 </AnchorPane>
+
