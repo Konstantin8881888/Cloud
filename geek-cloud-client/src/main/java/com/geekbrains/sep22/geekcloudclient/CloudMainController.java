@@ -86,7 +86,7 @@ public class CloudMainController implements Initializable
     public void renameFile(ActionEvent actionEvent) throws IOException
     {
         String fileOldName = serverView.getSelectionModel().getSelectedItem();
-        if (fileOldName != null) 
+        if (fileOldName != null)
         {
             DirectoryField.setVisible(true);
             CreateDir.setPromptText("ENTER NEW FILE NAME");
@@ -120,19 +120,32 @@ public class CloudMainController implements Initializable
                 {
                     DirectoryField.setVisible(true);
                     CreateDir.setPromptText("ENTER NEW FILE NAME");
+                    String finalFileOldName = fileOldName;
                     CreateDir.setOnKeyPressed(keyEvent -> {
                         if (keyEvent.getCode() == KeyCode.ENTER)
                         {
-
-                            String fileNewName = CreateDir.getText();
-                            File newFile = new File(currentDirectory + "/" + fileNewName);
-                            oldFile.renameTo(newFile);
+                            String newName = CreateDir.getText();
+                            File file = new File(currentDirectory + "/" + finalFileOldName);
+                            File newNameFile = new File(currentDirectory + "/" + newName);
+                            if (newNameFile.exists())
+                            {
+                                System.out.println("File with name " + newName + " is exist ");
+                            } else
+                            {
+                                if (file.renameTo(newNameFile))
+                                {
+                                    fillView(clientView, getFiles(currentDirectory));
+                                } else
+                                {
+                                    System.out.println("File not renamed");
+                                }
+                            }
                             DirectoryField.setVisible(false);
                             CreateDir.setText("");
+                            fillView(clientView, getFiles(currentDirectory));
                         }
                     });
-                    fillView(clientView, getFiles(currentDirectory));
-                    System.out.println("File renamed: " + fileOldName);
+
 
                 }
             }
@@ -254,6 +267,7 @@ public class CloudMainController implements Initializable
 //            if (keyEvent.getCode() == KeyCode.ENTER)
 //            {
 //                String dirName = CreateDir.getText();
+//                System.out.println(dirName);
 //                try
 //                {
 //                    network.getOutputStream().writeObject(new PathRequest(dirName));
@@ -266,7 +280,7 @@ public class CloudMainController implements Initializable
 //                }
 //            }
 //        });
-    }
+//    }
 
 }
 
