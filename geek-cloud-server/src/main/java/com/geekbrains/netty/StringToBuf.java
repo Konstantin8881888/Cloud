@@ -13,8 +13,7 @@ import java.nio.charset.StandardCharsets;
 public class StringToBuf extends ChannelOutboundHandlerAdapter
 {
     @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception
-    {
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
         String message = (String) msg;
         log.debug("Stirng to write: {}", msg);
         ByteBuf buf = ctx.alloc().buffer();

@@ -56,11 +56,16 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage>
 
         else if (cloudMessage instanceof PathRequest paths)
         {
-            if (new File(serverDir.toString() + File.separator + paths.getPathName()).isDirectory()) {
-                serverDir = serverDir.resolve(paths.getPathName()).normalize();
-                log.debug("Path: {}", serverDir);
-                ctx.writeAndFlush(new ListMessage(serverDir));
+            File createPath = new File(serverDir + File.separator + paths.getPathName());
+            if (createPath.exists())
+            {
+                System.out.println("Folder " + paths.getPathName() + " is exist! ");
+                return;
             }
+            if (!createPath.mkdir()) {
+                System.out.println("Folder " + paths.getPathName() + " is not created! ");
+            }
+            ctx.writeAndFlush(new ListMessage(serverDir));
         }
     }
 }

@@ -19,10 +19,10 @@ public class TelnetTerminal
 
 
     private Path current;
-    private ServerSocketChannel server;
-    private Selector selector;
+    private final ServerSocketChannel server;
+    private final Selector selector;
 
-    private ByteBuffer buf;
+    private final ByteBuffer buf;
 
     public TelnetTerminal() throws IOException
     {
@@ -114,7 +114,6 @@ public class TelnetTerminal
                         result = "Path " + createdDirectory.getFileName().toString() + " done\n\r";
                     }
                     default -> {
-                        break;
                     }
                 }
                 channel.write(ByteBuffer.wrap(result.getBytes(StandardCharsets.UTF_8)));

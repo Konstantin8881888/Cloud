@@ -13,19 +13,14 @@ public class FileHandler implements Runnable {
 
     private static final Integer BATCH_SIZE = 256;
 
-    private final Socket socket;
-
     private final DataInputStream dis;
 
     private final DataOutputStream dos;
 
-    private byte[] batch;
-
     public FileHandler(Socket socket) throws IOException {
-        this.socket = socket;
         dis = new DataInputStream(socket.getInputStream());
         dos = new DataOutputStream(socket.getOutputStream());
-        batch = new byte[BATCH_SIZE];
+        byte[] batch = new byte[BATCH_SIZE];
         File file = new File(SERVER_DIR);
         if (!file.exists()) {
             file.mkdir();

@@ -9,31 +9,27 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Slf4j
 public class EchoHandler extends SimpleChannelInboundHandler<String>
 {
-    private static ConcurrentLinkedDeque<ChannelHandlerContext> clients = new ConcurrentLinkedDeque<>();
+    private static final ConcurrentLinkedDeque<ChannelHandlerContext> clients = new ConcurrentLinkedDeque<>();
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, String s) throws Exception
-    {
+    protected void channelRead0(ChannelHandlerContext ctx, String s) {
         log.debug("Received: {}", s);
         clients.forEach(context -> context.writeAndFlush(s));
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception
-    {
+    public void channelActive(ChannelHandlerContext ctx) {
         log.debug("Client connected...");
         clients.add(ctx);
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception
-    {
+    public void channelInactive(ChannelHandlerContext ctx) {
         log.debug("Client disconnected...");
         clients.remove(ctx);
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-    {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("", cause);
     }
 }
