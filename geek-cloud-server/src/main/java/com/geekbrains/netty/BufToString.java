@@ -10,8 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BufToString extends ChannelInboundHandlerAdapter
 {
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
-    {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         ByteBuf buf = (ByteBuf) msg;
         log.debug("Received: {}", buf);
         StringBuilder s = new StringBuilder();

@@ -25,8 +25,7 @@ public class FileServer
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(auth, worker).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                protected void initChannel(SocketChannel socketChannel) throws Exception
-                {
+                protected void initChannel(SocketChannel socketChannel) {
                     socketChannel.pipeline().addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)), new ObjectEncoder(), new FileHandler());
                 }
             });
